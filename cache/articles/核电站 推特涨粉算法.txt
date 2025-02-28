@@ -1,0 +1,7 @@
+标题: 核电站: 推特涨粉算法
+
+发布时间: 
+原文链接: https://hwv430.blogspot.com/2025/02/blog-post_96.html
+
+正文内容:
+网传一段推特开源代码，关于内容权重的部分。 排名分数（Twitter Ranking Score）的公式：75 * is_replied_reply_engaged_by_author：当推文被回复且回复被原作者互动时，此部分分数为 75 乘以该状态（该状态应为布尔值，取值为 0 或 1）。+ 27 * is_replied：推文被回复时，分数为 27 乘以该状态（布尔值，取值为 0 或 1）。+ 12 * is_profile_clicked_and_profile_engaged：当推文导致用户点击并互动了作者个人资料时，分数为 12 乘以该状态（布尔值，取值为 0 或 1）。+ 11 * MAX(is_good_clicked_convo_desc_favorited_or_replied, is_good_clicked_convo_desc_v2)：取is_good_clicked_convo_desc_favorited_or_replied和is_good_clicked_convo_desc_v2两个布尔值中的较大值，乘以 11 后加入分数。+ 1.0 * is_retweeted：推文被转发时，分数为 1 乘以该状态（布尔值，取值为 0 或 1）。 + 0.5 * is_favorited：推文被点赞时，分数为 0.5 乘以该状态（布尔值，取值为 0 或 1）。+ 0.005 * is_video_playback_50：当推文中的视频播放进度达到 50% 时，分数为 0.005 乘以该状态（布尔值，取值为 0 或 1）。- 74 * is_negative_feedback_v2：如果收到负面反馈，分数减去 74 乘以该状态（布尔值，取值为 0 或 1）。- 369 * is_report_tweet_clicked：如果推文被点击举报，分数减去 369 乘以该状态（布尔值，取值为 0 或 1）。总结：评论和评论区互动，权重最高。从推文内容进入作者介绍页，权重也很高。点赞，也有点用，权重一般。

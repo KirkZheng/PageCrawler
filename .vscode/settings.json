@@ -1,0 +1,5 @@
+{
+    "files.autoSave": "afterDelay",
+    "editor.cursorStyle": "underline-thin",
+    "editor.wordWrap": "on"
+}
