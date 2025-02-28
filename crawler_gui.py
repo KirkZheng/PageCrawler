@@ -185,6 +185,12 @@ class WebCrawlerGUI:
                 date_elements = soup.find_all(['time', 'span', 'div'], class_=['date', 'time', 'published', 'post-date'])
                 if date_elements:
                     publish_date = date_elements[0].get_text().strip()
+                    # 尝试解析日期字符串为datetime对象
+                    try:
+                        from dateutil import parser
+                        publish_date = parser.parse(publish_date).isoformat()
+                    except:
+                        pass
                 
                 # 提取完整内容
                 content = ''
@@ -196,7 +202,7 @@ class WebCrawlerGUI:
                 # 提取预览内容
                 preview = content[:200] + '...' if len(content) > 200 else content
                 
-                # 提取链接
+                # 提取链接并按日期排序
                 links = set()
                 base_domain = urlparse(url).netloc
                 for link in soup.find_all('a'):
@@ -235,12 +241,24 @@ class WebCrawlerGUI:
                 urls_to_crawl = set()
                 futures = []
                 
+                # 从缓存中获取已知的文章发布时间
+                url_dates = []
+                for url in to_visit:
+                    if url in self.articles_cache and self.articles_cache[url].get('publish_date'):
+                        url_dates.append((url, self.articles_cache[url]['publish_date']))
+                    else:
+                        url_dates.append((url, ''))
+                
+                # 按发布时间排序，未知时间的放在后面
+                url_dates.sort(key=lambda x: x[1] if x[1] else '', reverse=True)
+                
                 # 选择要爬取的URL
-                while len(futures) < 5 and to_visit:  # 最多同时爬取5个页面
-                    url = to_visit.pop()
+                while len(futures) < 5 and url_dates:  # 最多同时爬取5个页面
+                    url, _ = url_dates.pop(0)
                     if url not in self.crawled_urls:
                         futures.append(executor.submit(self.fetch_page, url))
                         urls_to_crawl.add(url)
+                        to_visit.remove(url)
                 
                 if not futures:
                     break
