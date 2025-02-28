@@ -1,7 +1,7 @@
 标题: 核电站: 无限制下载器 – 能播放的视频，就能下载[油猴脚本...
 
 发布时间: 
-原文链接: https://hwv430.blogspot.com/2023/03/blog-post.html#comment-form
+原文链接: https://hwv430.blogspot.com/2023/03/blog-post.html
 
 正文内容:
 无限制下载器 是一款简单易用的油猴脚本，开发者只说了一句话：「直接获取视频和音频二进制流，打破所有下载限制。（只要你可以播放，你就可以下载！）」@Appinn 感谢 #3001 群组的 @Untitled Project R 同学推荐。 无限制下载器 这是一个油猴脚本，开发者在 v2ex 描述了原理： 原理 直接 hook 二进制流，你缓存多少，我给你复制多少。查了下MediaSource, 他结合上面的createObjectURL(object)可以分片的方式加载视频，大概就是看多少，就加多少。 其中的音频和视频分别放在两个 sourceBuffer 中，直接 hook 住SourceBuffer.appendBuffer()就能实现视频流的截取了。再将每个分片以数组的方式保存下来，最后等视频缓存完后 new Blob(video/audio bufferArray)这样就实现了视频和音频的保存。 简单的说：直接 hook 媒体二进制流，换句话说就是你能看到，你就能下载，你能缓存多快，你就能下载多快。 获取 Greasy Fork 用户脚本管理器 在使用油猴脚本之前，需要安装一个用户脚本管理器，推荐：Tampermonkey 使用 而使用就有点…奇葩了，因为它是全自动的：打开任意有视频或音频的网站，等视频缓存条加载完后会自动下载下来。 注意，需要等视频缓存完全加载之后，才会自动下载，也就是说，你需要等那条视频播放一遍，至少是倍速播放一遍才行。 倍速播放方法一 当然开发者也提供了方法：打开控制台（F12），输入：document.querySelector('video').playbackRate = 16 就会以 16 倍速播放： 倍速播放方法二 对于不喜欢命令行的同学，用浏览器扩展是最好的了： Global Speed – 在线视频播放控制：倍速、倒带/前进、逐帧分析、标记、AB 重复等[Chrome/Firefox] 安装这个扩展之后，默认 D 加速，S 恢复，A 减速，就这么简单。 合并音频与视频文件 下载完成之后，会得到两个文件：vidoe_xxx.mp4 和 audio_xxx.mp4，需要使用 ffmpeg（官网下载页面） 来合并： ffmpeg -i video.mp4 -i audio.mp4 -c:v copy -c:a aac -strict experimental output.mp4 然后，就好了。 非常适合下载那些学习类视频，可以多次观看那种。 原文：https://ift.tt/CmJKUdF 最后，记得不用的时候关闭脚本，因为它会一直不断的下载你看过的所有视频。 相关阅读 History Trends Unlimited – Chrome 网络访问历史趋势 教你用电脑从 Google Play 下载 Android 程序 apk 文件 Unlimited Mouse – 让鼠标突破屏幕边界 HTTP Downloader – 一个简约的下载器，最大 10000 个连接，支持 Chrome/Firefox 扩展[Windows] APK Downloader – 在线从 Google Play 下载 APK 文件 ©2021 青小蛙 for 小众软件 | 加入我们 | 投稿 | 订阅指南 3659b075e72a5b7b1b87ea74aa7932ff 点击这里留言、和原作者一起评论 [ 点击前往获取链接 ]
