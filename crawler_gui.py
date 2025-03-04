@@ -19,15 +19,15 @@ class WebCrawlerGUI:
         self.root.title('网站爬虫工具')
         self.root.geometry('800x600')
         
-        # 设置主题色 - 红黑风格
+        # 设置主题色 - 白色主题
         self.style = ttk.Style()
-        self.style.configure('TFrame', background='#1a1a1a')
-        self.style.configure('TLabel', background='#1a1a1a', font=('微软雅黑', 10), foreground='#ffffff')
-        self.style.configure('TButton', font=('微软雅黑', 10), foreground='#ffffff')
-        self.style.configure('Custom.TButton', background='#ff3333', foreground='#ffffff')
+        self.style.configure('TFrame', background='#ffffff')
+        self.style.configure('TLabel', background='#ffffff', font=('微软雅黑', 10, 'bold'), foreground='#000000')
+        self.style.configure('TButton', font=('微软雅黑', 10, 'bold'), foreground='#000000')
+        self.style.configure('Custom.TButton', background='#4a90e2', foreground='#000000', font=('微软雅黑', 10, 'bold'))
         
         # 设置窗口背景色
-        self.root.configure(bg='#1a1a1a')
+        self.root.configure(bg='#ffffff')
         
         # 创建GUI组件
         self.create_widgets()
@@ -60,7 +60,7 @@ class WebCrawlerGUI:
         url_frame.pack(fill=tk.X, padx=20, pady=10)
         
         ttk.Label(url_frame, text='网站URL:').pack(side=tk.LEFT)
-        self.url_entry = ttk.Entry(url_frame, font=('微软雅黑', 10))
+        self.url_entry = ttk.Entry(url_frame, font=('微软雅黑', 10, 'bold'))
         self.url_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         self.url_entry.insert(0, 'https://hwv430.blogspot.com/')
         
@@ -69,7 +69,7 @@ class WebCrawlerGUI:
         stats_frame.pack(fill=tk.X, padx=20, pady=5)
         
         self.stats_text = tk.StringVar()
-        stats_label = ttk.Label(stats_frame, textvariable=self.stats_text, font=('微软雅黑', 10))
+        stats_label = ttk.Label(stats_frame, textvariable=self.stats_text, font=('微软雅黑', 10, 'bold'))
         stats_label.pack(pady=5)
         
         # 控制按钮和搜索框
@@ -81,7 +81,7 @@ class WebCrawlerGUI:
         
         # 搜索框
         ttk.Label(btn_frame, text='搜索:').pack(side=tk.LEFT, padx=(20, 5))
-        self.search_entry = ttk.Entry(btn_frame, font=('微软雅黑', 10))
+        self.search_entry = ttk.Entry(btn_frame, font=('微软雅黑', 10, 'bold'))
         self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         self.search_entry.bind('<Return>', lambda e: self.search_articles())
         
@@ -100,24 +100,24 @@ class WebCrawlerGUI:
         self.result_text = scrolledtext.ScrolledText(
             result_frame,
             height=20,
-            font=('微软雅黑', 12),  # 增大字体
+            font=('微软雅黑', 12, 'bold'),
             wrap=tk.WORD,
-            background='#000000',
-            foreground='#ffffff',
-            selectbackground='#ff3333',
+            background='#ffffff',
+            foreground='#000000',
+            selectbackground='#4a90e2',
             relief='flat',
             borderwidth=0
         )
         self.result_text.pack(fill=tk.BOTH, expand=True)
         
         # 配置链接样式
-        self.result_text.tag_configure('link', foreground='#ffffff', underline=True)
+        self.result_text.tag_configure('link', foreground='#4a90e2', underline=True)
         self.result_text.tag_bind('link', '<Button-1>', self.on_link_click)
         self.result_text.tag_bind('link', '<Enter>', lambda e: self.result_text.configure(cursor='hand2'))
         self.result_text.tag_bind('link', '<Leave>', lambda e: self.result_text.configure(cursor=''))
         
         # 配置高亮样式
-        self.result_text.tag_configure('highlight', foreground='#4a90e2')  # 修改高亮颜色为柔和的蓝色
+        self.result_text.tag_configure('highlight', foreground='#4a90e2')
     
     def start_crawling(self):
         if self.is_crawling:
@@ -339,34 +339,65 @@ class WebCrawlerGUI:
             
         cache_file = os.path.join(self.cache_dir, 'articles.json')
         temp_file = f"{cache_file}.tmp"
+        backup_file = f"{cache_file}.bak"
         
         try:
             # 创建临时字典并更新数据
             temp_cache = dict(self.articles_cache)
             temp_cache[url] = article_data
             
+            # 检查文件权限
+            if os.path.exists(cache_file):
+                try:
+                    # 尝试创建备份文件以检查写入权限
+                    with open(backup_file, 'w', encoding='utf-8') as f:
+                        pass
+                    os.remove(backup_file)
+                except Exception as e:
+                    print(f'缓存目录没有写入权限: {str(e)}')
+                    return
+            
             # 将临时字典写入临时文件
             with open(temp_file, 'w', encoding='utf-8') as f:
                 json.dump(temp_cache, f, ensure_ascii=False, indent=2)
             
-            # 成功写入后替换原文件
+            # 创建备份
             if os.path.exists(cache_file):
-                os.replace(temp_file, cache_file)
-            else:
-                os.rename(temp_file, cache_file)
+                try:
+                    os.replace(cache_file, backup_file)
+                except Exception as e:
+                    print(f'创建备份文件失败: {str(e)}')
+                    if os.path.exists(temp_file):
+                        os.remove(temp_file)
+                    return
             
-            # 更新内存中的缓存
-            self.articles_cache = temp_cache
-            # 更新统计信息
-            self.update_statistics()
+            # 临时文件重命名为正式文件
+            try:
+                os.rename(temp_file, cache_file)
+                # 更新内存中的缓存
+                self.articles_cache = temp_cache
+                # 更新统计信息
+                self.update_statistics()
+                # 成功后删除备份
+                if os.path.exists(backup_file):
+                    os.remove(backup_file)
+            except Exception as e:
+                print(f'更新缓存文件失败: {str(e)}')
+                # 恢复备份
+                if os.path.exists(backup_file):
+                    try:
+                        os.replace(backup_file, cache_file)
+                    except Exception as restore_error:
+                        print(f'恢复备份失败: {str(restore_error)}')
         except Exception as e:
             print(f'保存缓存出错: {str(e)}')
             # 清理临时文件
-            if os.path.exists(temp_file):
-                try:
-                    os.remove(temp_file)
-                except:
-                    pass
+            for file in [temp_file, backup_file]:
+                if os.path.exists(file):
+                    try:
+                        os.remove(file)
+                    except:
+                        pass
     
     def search_articles(self):
         keyword = self.search_entry.get().strip()
