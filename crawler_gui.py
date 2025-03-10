@@ -22,9 +22,9 @@ class WebCrawlerGUI:
         # 设置主题色 - 白色主题
         self.style = ttk.Style()
         self.style.configure('TFrame', background='#ffffff')
-        self.style.configure('TLabel', background='#ffffff', font=('微软雅黑', 10, 'bold'), foreground='#000000')
-        self.style.configure('TButton', font=('微软雅黑', 10, 'bold'), foreground='#000000')
-        self.style.configure('Custom.TButton', background='#4a90e2', foreground='#000000', font=('微软雅黑', 10, 'bold'))
+        self.style.configure('TLabel', background='#ffffff', font=('微软雅黑', 12), foreground='#000000')
+        self.style.configure('TButton', font=('微软雅黑', 12), foreground='#000000')
+        self.style.configure('Custom.TButton', background='#4a90e2', foreground='#000000', font=('微软雅黑', 12))
         
         # 设置窗口背景色
         self.root.configure(bg='#ffffff')
@@ -60,7 +60,7 @@ class WebCrawlerGUI:
         url_frame.pack(fill=tk.X, padx=20, pady=10)
         
         ttk.Label(url_frame, text='网站URL:').pack(side=tk.LEFT)
-        self.url_entry = ttk.Entry(url_frame, font=('微软雅黑', 10, 'bold'))
+        self.url_entry = ttk.Entry(url_frame, font=('微软雅黑', 12))
         self.url_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         self.url_entry.insert(0, 'https://hwv430.blogspot.com/')
         
@@ -69,7 +69,7 @@ class WebCrawlerGUI:
         stats_frame.pack(fill=tk.X, padx=20, pady=5)
         
         self.stats_text = tk.StringVar()
-        stats_label = ttk.Label(stats_frame, textvariable=self.stats_text, font=('微软雅黑', 10, 'bold'))
+        stats_label = ttk.Label(stats_frame, textvariable=self.stats_text, font=('微软雅黑', 12))
         stats_label.pack(pady=5)
         
         # 控制按钮和搜索框
@@ -81,7 +81,7 @@ class WebCrawlerGUI:
         
         # 搜索框
         ttk.Label(btn_frame, text='搜索:').pack(side=tk.LEFT, padx=(20, 5))
-        self.search_entry = ttk.Entry(btn_frame, font=('微软雅黑', 10, 'bold'))
+        self.search_entry = ttk.Entry(btn_frame, font=('微软雅黑', 12))
         self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         self.search_entry.bind('<Return>', lambda e: self.search_articles())
         
@@ -90,7 +90,7 @@ class WebCrawlerGUI:
         
         # 进度显示
         self.progress_var = tk.StringVar()
-        progress_label = ttk.Label(self.root, textvariable=self.progress_var, font=('微软雅黑', 10, 'bold'))
+        progress_label = ttk.Label(self.root, textvariable=self.progress_var, font=('微软雅黑', 12))
         progress_label.pack(pady=10)
         
         # 结果显示区域 - 使用Material Design卡片式布局
@@ -100,13 +100,16 @@ class WebCrawlerGUI:
         self.result_text = scrolledtext.ScrolledText(
             result_frame,
             height=20,
-            font=('微软雅黑', 12, 'bold'),
+            font=('微软雅黑', 13),
             wrap=tk.WORD,
             background='#ffffff',
             foreground='#000000',
             selectbackground='#4a90e2',
             relief='flat',
-            borderwidth=0
+            borderwidth=0,
+            spacing1=2,  # 段落前空行
+            spacing2=2,  # 文字行间距
+            spacing3=2   # 段落后空行
         )
         self.result_text.pack(fill=tk.BOTH, expand=True)
         
@@ -165,8 +168,6 @@ class WebCrawlerGUI:
         if url in self.articles_cache:
             print(f'从缓存中获取文章: {url}')
             article_data = self.articles_cache[url]
-            # 保存为txt文件
-            self.save_article_as_txt(article_data)
             return article_data
             
         try:
