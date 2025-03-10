@@ -36,7 +36,7 @@ class WebCrawlerGUI:
         self.is_crawling = False
         self.crawled_urls = set()
         self.crawled_count = 0
-        self.max_articles = 50  # 增加爬取数量限制
+        self.max_articles = float('inf')  # 移除爬取数量限制
         
         # 统计信息
         self.total_articles = 0
