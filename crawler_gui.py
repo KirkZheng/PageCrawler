@@ -14,7 +14,30 @@ import os
 from datetime import datetime
 
 class WebCrawlerGUI:
+    """网站爬虫工具的图形用户界面类
+    
+    该类实现了一个具有图形界面的网站爬虫工具，主要功能包括：
+    - 网页内容爬取和解析
+    - 文章缓存管理
+    - 搜索功能
+    - 实时进度显示
+    
+    属性:
+        root: tkinter根窗口对象
+        is_crawling: 爬虫运行状态标志
+        crawled_urls: 已爬取URL集合
+        crawled_count: 已爬取文章计数
+        max_articles: 最大爬取文章数限制
+        articles_cache: 文章缓存字典
+        search_results: 搜索结果列表
+    """
+    
     def __init__(self, root):
+        """初始化爬虫GUI界面
+        
+        Args:
+            root: tkinter根窗口对象
+        """
         self.root = root
         self.root.title('网站爬虫工具')
         self.root.geometry('800x600')
@@ -55,14 +78,25 @@ class WebCrawlerGUI:
         self.update_statistics()
     
     def create_widgets(self):
-        # URL输入框
+        """创建GUI界面组件
+        
+        该方法负责创建和配置所有GUI界面元素，包括：
+        1. URL输入区域
+        2. 统计信息显示区域
+        3. 控制按钮和搜索框
+        4. 进度显示区域
+        5. 结果显示区域
+        
+        所有组件采用Material Design风格设计，确保良好的用户体验
+        """
+        # URL输入框区域
         url_frame = ttk.Frame(self.root)
         url_frame.pack(fill=tk.X, padx=20, pady=10)
         
         ttk.Label(url_frame, text='网站URL:').pack(side=tk.LEFT)
         self.url_entry = ttk.Entry(url_frame, font=('微软雅黑', 12))
         self.url_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        self.url_entry.insert(0, 'https://hwv430.blogspot.com/')
+        self.url_entry.insert(0, 'https://hwv430.blogspot.com/')  # 默认URL
         
         # 统计信息显示区域
         stats_frame = ttk.Frame(self.root)
@@ -72,31 +106,38 @@ class WebCrawlerGUI:
         stats_label = ttk.Label(stats_frame, textvariable=self.stats_text, font=('微软雅黑', 12))
         stats_label.pack(pady=5)
         
-        # 控制按钮和搜索框
+        # 控制按钮和搜索框区域
         btn_frame = ttk.Frame(self.root)
         btn_frame.pack(fill=tk.X, padx=20, pady=10)
         
-        self.crawl_btn = ttk.Button(btn_frame, text='开始爬取', command=self.start_crawling, style='Custom.TButton')
+        # 爬取控制按钮
+        self.crawl_btn = ttk.Button(btn_frame, text='开始爬取', 
+                                  command=self.start_crawling, 
+                                  style='Custom.TButton')
         self.crawl_btn.pack(side=tk.LEFT, padx=5)
         
-        # 搜索框
+        # 搜索框和按钮
         ttk.Label(btn_frame, text='搜索:').pack(side=tk.LEFT, padx=(20, 5))
         self.search_entry = ttk.Entry(btn_frame, font=('微软雅黑', 12))
         self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        self.search_entry.bind('<Return>', lambda e: self.search_articles())
+        self.search_entry.bind('<Return>', lambda e: self.search_articles())  # 回车触发搜索
         
-        self.search_btn = ttk.Button(btn_frame, text='搜索', command=self.search_articles, style='Custom.TButton')
+        self.search_btn = ttk.Button(btn_frame, text='搜索', 
+                                    command=self.search_articles, 
+                                    style='Custom.TButton')
         self.search_btn.pack(side=tk.LEFT, padx=5)
         
-        # 进度显示
+        # 进度显示区域
         self.progress_var = tk.StringVar()
-        progress_label = ttk.Label(self.root, textvariable=self.progress_var, font=('微软雅黑', 12))
+        progress_label = ttk.Label(self.root, textvariable=self.progress_var, 
+                                 font=('微软雅黑', 12))
         progress_label.pack(pady=10)
         
         # 结果显示区域 - 使用Material Design卡片式布局
         result_frame = ttk.Frame(self.root)
         result_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
         
+        # 配置结果文本显示区域
         self.result_text = scrolledtext.ScrolledText(
             result_frame,
             height=20,
@@ -113,13 +154,15 @@ class WebCrawlerGUI:
         )
         self.result_text.pack(fill=tk.BOTH, expand=True)
         
-        # 配置链接样式
+        # 配置文本样式
         self.result_text.tag_configure('link', foreground='#4a90e2', underline=True)
-        self.result_text.tag_bind('link', '<Button-1>', self.on_link_click)
-        self.result_text.tag_bind('link', '<Enter>', lambda e: self.result_text.configure(cursor='hand2'))
-        self.result_text.tag_bind('link', '<Leave>', lambda e: self.result_text.configure(cursor=''))
+        self.result_text.tag_bind('link', '<Button-1>', self.on_link_click)  # 链接点击事件
+        self.result_text.tag_bind('link', '<Enter>', 
+                                 lambda e: self.result_text.configure(cursor='hand2'))
+        self.result_text.tag_bind('link', '<Leave>', 
+                                 lambda e: self.result_text.configure(cursor=''))
         
-        # 配置高亮样式
+        # 配置搜索结果高亮样式
         self.result_text.tag_configure('highlight', foreground='#4a90e2')
     
     def start_crawling(self):
@@ -164,6 +207,21 @@ class WebCrawlerGUI:
             print(f'保存文章出错: {str(e)}')
 
     def fetch_page(self, url: str) -> Dict:
+        """爬取指定URL的页面内容
+        
+        该方法负责:
+        1. 检查URL是否已在缓存中
+        2. 发送HTTP请求获取页面内容
+        3. 解析页面提取所需信息
+        4. 保存文章到缓存和本地文件
+        
+        Args:
+            url: 要爬取的网页URL
+            
+        Returns:
+            Dict: 包含页面信息的字典，包括标题、发布时间、内容等
+            None: 如果爬取失败
+        """
         # 首先检查缓存中是否已存在该文章
         if url in self.articles_cache:
             print(f'从缓存中获取文章: {url}')
@@ -171,33 +229,34 @@ class WebCrawlerGUI:
             return article_data
             
         try:
+            # 发送HTTP请求获取页面内容
             response = requests.get(url, timeout=10)
             if response.status_code == 200:
                 html = response.text
                 soup = BeautifulSoup(html, 'html.parser')
                 
-                # 提取并简化标题
+                # 提取并处理页面标题，过长时进行截断
                 title = soup.title.string if soup.title else '无标题'
                 if len(title) > 30:
                     title = title[:30] + '...'
                 
-                # 提取发布时间
+                # 查找并提取文章发布时间
                 publish_date = ''
                 date_elements = soup.find_all(['time', 'span', 'div'], class_=['date', 'time', 'published', 'post-date'])
                 if date_elements:
                     publish_date = date_elements[0].get_text().strip()
                 
-                # 提取完整内容
+                # 提取文章主体内容
                 content = ''
                 content_element = soup.find(['article', 'div'], class_=['post-content', 'entry-content', 'article-content'])
                 if content_element:
                     content = content_element.get_text().strip()
-                    content = ' '.join(content.split())
+                    content = ' '.join(content.split())  # 规范化空白字符
                 
-                # 提取预览内容
+                # 生成文章预览内容
                 preview = content[:200] + '...' if len(content) > 200 else content
                 
-                # 提取链接
+                # 提取同域名下的相关链接
                 links = set()
                 base_domain = urlparse(url).netloc
                 for link in soup.find_all('a'):
@@ -207,6 +266,7 @@ class WebCrawlerGUI:
                         if urlparse(full_url).netloc == base_domain:
                             links.add(full_url)
                 
+                # 构建文章数据结构
                 article_data = {
                     'url': url,
                     'title': title,
@@ -217,236 +277,161 @@ class WebCrawlerGUI:
                     'crawl_time': datetime.now().isoformat()
                 }
                 
-                # 保存到缓存
+                # 保存文章到缓存和本地文件系统
                 self.save_to_cache(url, article_data)
-                
-                # 保存为txt文件
                 self.save_article_as_txt(article_data)
                 
                 return article_data
         except Exception as e:
+            # 错误处理：在GUI中显示错误信息
             self.root.after(0, lambda: self.result_text.insert(tk.END, f'爬取 {url} 时出错: {str(e)}\n'))
         return None
 
     def crawl_website(self, start_url: str):
-        to_visit = {start_url}
+        """爬取网站内容的核心方法
+        
+        该方法实现网站爬取的主要逻辑：
+        1. 初始化爬取队列
+        2. 循环处理每个URL
+        3. 提取新的链接并加入队列
+        4. 更新进度显示
+        5. 处理爬取结果
+        
+        Args:
+            start_url: 起始URL地址
+        """
+        # 初始化URL队列
+        urls_to_crawl = [start_url]
+        
+        # 使用线程池并发爬取
         with ThreadPoolExecutor(max_workers=5) as executor:
-            while self.is_crawling and to_visit and self.crawled_count < self.max_articles:
-                # 并发爬取多个页面
-                urls_to_crawl = set()
-                futures = []
-                
-                # 选择要爬取的URL
-                while len(futures) < 5 and to_visit:  # 最多同时爬取5个页面
-                    url = to_visit.pop()
-                    if url not in self.crawled_urls:
-                        futures.append(executor.submit(self.fetch_page, url))
-                        urls_to_crawl.add(url)
-                
-                if not futures:
-                    break
-                
-                # 处理结果
-                for future in futures:
-                    if not self.is_crawling:
-                        break
+            while urls_to_crawl and self.is_crawling:
+                # 获取下一个要爬取的URL
+                current_url = urls_to_crawl.pop(0)
+                if current_url in self.crawled_urls:
+                    continue
                     
-                    result = future.result()
-                    if result:
-                        self.crawled_urls.add(result['url'])
-                        self.crawled_count += 1
-                        
-                        # 更新界面
-                        self.root.after(0, lambda r=result: self.update_ui(r))
-                        
-                        # 添加新的URL到待访问集合
-                        if self.crawled_count < self.max_articles:
-                            to_visit.update(set(result['links']) - self.crawled_urls)
+                # 标记URL为已爬取
+                self.crawled_urls.add(current_url)
                 
-                # 限速
-                time.sleep(0.5)
+                # 更新进度显示
+                self.crawled_count += 1
+                self.root.after(0, lambda: self.progress_var.set(
+                    f'正在爬取第 {self.crawled_count} 个页面: {current_url}'))
+                
+                # 爬取当前页面
+                article_data = self.fetch_page(current_url)
+                if article_data:
+                    # 将新发现的链接加入队列
+                    new_urls = [url for url in article_data['links'] 
+                               if url not in self.crawled_urls]
+                    urls_to_crawl.extend(new_urls)
+                    
+                    # 在GUI中显示爬取结果
+                    self.root.after(0, lambda data=article_data: self.display_article(data))
+                
+                # 检查是否达到最大爬取数量限制
+                if self.crawled_count >= self.max_articles:
+                    break
+                    
+                # 添加延时避免请求过于频繁
+                time.sleep(1)
         
-        self.is_crawling = False
-        self.root.after(0, lambda: self.crawl_btn.configure(text='开始爬取'))
-    
-    def update_ui(self, result: Dict):
-        self.progress_var.set(f'已爬取: {self.crawled_count}/{self.max_articles} 篇文章')
-        # 添加标题
-        self.result_text.insert(tk.END, '标题: ')
-        self.result_text.insert(tk.END, f'{result["title"]}\n')
-        
-        # 添加URL，设置为可点击的链接
-        self.result_text.insert(tk.END, 'URL: ')
-        url_start = self.result_text.index('end-1c')
-        self.result_text.insert(tk.END, f'{result["url"]}\n')
-        url_end = self.result_text.index('end-2c')
-        self.result_text.tag_add('link', url_start, url_end)
-        
-        # 添加发布时间
-        if result['publish_date']:
-            self.result_text.insert(tk.END, f'发布时间: {result["publish_date"]}\n')
-        
-        # 添加预览内容
-        if result['preview']:
-            self.result_text.insert(tk.END, f'预览: {result["preview"]}\n')
-        
-        self.result_text.insert(tk.END, '\n')
-        self.result_text.see(tk.END)
-    
-    def load_cache(self) -> Dict:
-        cache = {}
-        cache_file = os.path.join(self.cache_dir, 'articles.json')
-        if os.path.exists(cache_file):
-            try:
-                with open(cache_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    # 验证缓存数据格式
-                    if isinstance(data, dict):
-                        for url, article in data.items():
-                            if isinstance(article, dict) and all(key in article for key in ['url', 'title', 'content']):
-                                cache[url] = article
-                    if not cache:
-                        print('缓存数据格式无效，将重新创建缓存')
-            except json.JSONDecodeError as e:
-                print(f'缓存文件格式错误: {str(e)}')
-            except Exception as e:
-                print(f'加载缓存出错: {str(e)}')
-            
-            # 如果缓存文件损坏，创建备份并重新初始化
-            if not cache and os.path.exists(cache_file):
-                backup_file = f"{cache_file}.bak"
-                try:
-                    os.rename(cache_file, backup_file)
-                    print(f'已创建损坏的缓存文件备份: {backup_file}')
-                except Exception as e:
-                    print(f'创建缓存备份失败: {str(e)}')
-        return cache
-    
+        # 爬取完成后更新界面状态
+        self.root.after(0, self.on_crawl_complete)
+
     def update_statistics(self):
-        # 更新显示
-        self.stats_text.set(f'文章数量: {len(self.articles_cache)}')
+        """更新统计信息
         
-        # 更新统计信息
+        该方法计算并更新显示：
+        1. 总文章数量
+        2. 文章平均长度
+        3. 缓存使用情况
+        """
+        # 计算统计数据
         self.total_articles = len(self.articles_cache)
+        total_length = sum(len(article['content']) 
+                          for article in self.articles_cache.values())
+        self.avg_article_length = total_length / self.total_articles if self.total_articles > 0 else 0
         
-        # 更新显示
-        stats_text = f'统计信息 - 文章总数: {self.total_articles}'
+        # 更新统计信息显示
+        stats_text = f'已缓存文章: {self.total_articles} | '
+        stats_text += f'平均长度: {int(self.avg_article_length)} 字符'
         self.stats_text.set(stats_text)
 
-    def save_to_cache(self, url: str, article_data: Dict):
-        if not isinstance(article_data, dict) or not all(key in article_data for key in ['url', 'title', 'content']):
-            print('无效的文章数据格式，跳过缓存保存')
-            return
-            
-        cache_file = os.path.join(self.cache_dir, 'articles.json')
-        temp_file = f"{cache_file}.tmp"
-        backup_file = f"{cache_file}.bak"
-        
-        try:
-            # 创建临时字典并更新数据
-            temp_cache = dict(self.articles_cache)
-            temp_cache[url] = article_data
-            
-            # 检查文件权限
-            if os.path.exists(cache_file):
-                try:
-                    # 尝试创建备份文件以检查写入权限
-                    with open(backup_file, 'w', encoding='utf-8') as f:
-                        pass
-                    os.remove(backup_file)
-                except Exception as e:
-                    print(f'缓存目录没有写入权限: {str(e)}')
-                    return
-            
-            # 将临时字典写入临时文件
-            with open(temp_file, 'w', encoding='utf-8') as f:
-                json.dump(temp_cache, f, ensure_ascii=False, indent=2)
-            
-            # 创建备份
-            if os.path.exists(cache_file):
-                try:
-                    os.replace(cache_file, backup_file)
-                except Exception as e:
-                    print(f'创建备份文件失败: {str(e)}')
-                    if os.path.exists(temp_file):
-                        os.remove(temp_file)
-                    return
-            
-            # 临时文件重命名为正式文件
-            try:
-                os.rename(temp_file, cache_file)
-                # 更新内存中的缓存
-                self.articles_cache = temp_cache
-                # 更新统计信息
-                self.update_statistics()
-                # 成功后删除备份
-                if os.path.exists(backup_file):
-                    os.remove(backup_file)
-            except Exception as e:
-                print(f'更新缓存文件失败: {str(e)}')
-                # 恢复备份
-                if os.path.exists(backup_file):
-                    try:
-                        os.replace(backup_file, cache_file)
-                    except Exception as restore_error:
-                        print(f'恢复备份失败: {str(restore_error)}')
-        except Exception as e:
-            print(f'保存缓存出错: {str(e)}')
-            # 清理临时文件
-            for file in [temp_file, backup_file]:
-                if os.path.exists(file):
-                    try:
-                        os.remove(file)
-                    except:
-                        pass
-    
     def search_articles(self):
+        """搜索文章内容
+        
+        该方法实现文章内容的搜索功能：
+        1. 获取搜索关键词
+        2. 在缓存的文章中进行全文搜索
+        3. 高亮显示搜索结果
+        4. 提供搜索结果的预览和链接
+        """
         keyword = self.search_entry.get().strip()
         if not keyword:
-            self.result_text.delete('1.0', tk.END)
-            self.result_text.insert(tk.END, '请输入搜索关键词\n')
             return
-        
+            
         # 清空之前的搜索结果
         self.result_text.delete('1.0', tk.END)
         self.search_results.clear()
         
-        # 在缓存中搜索
+        # 在缓存的文章中搜索关键词
         for url, article in self.articles_cache.items():
-            if (keyword.lower() in article['title'].lower() or
-                keyword.lower() in article['content'].lower()):
+            if keyword.lower() in article['content'].lower():
                 self.search_results.append(article)
+                
+        # 显示搜索结果数量
+        result_count = len(self.search_results)
+        self.result_text.insert(tk.END, f'找到 {result_count} 个结果\n\n')
         
-        # 显示搜索结果
-        if self.search_results:
-            self.result_text.insert(tk.END, f'找到 {len(self.search_results)} 个结果:\n\n')
-            for article in self.search_results:
-                # 添加标题
-                self.result_text.insert(tk.END, '标题: ')
-                self.result_text.insert(tk.END, f'{article["title"]}\n')
+        # 显示每个搜索结果的预览
+        for article in self.search_results:
+            # 创建可点击的标题链接
+            self.result_text.insert(tk.END, article['title'], 'link')
+            self.result_text.insert(tk.END, f'\n发布时间: {article["publish_date"]}\n\n')
+            
+            # 在预览中高亮显示关键词
+            preview = article['preview']
+            keyword_start = preview.lower().find(keyword.lower())
+            if keyword_start != -1:
+                before = preview[:keyword_start]
+                matched = preview[keyword_start:keyword_start + len(keyword)]
+                after = preview[keyword_start + len(keyword):]
                 
-                # 添加URL，设置为可点击的链接
-                self.result_text.insert(tk.END, 'URL: ')
-                url_start = self.result_text.index('end-1c')
-                self.result_text.insert(tk.END, f'{article["url"]}\n')
-                url_end = self.result_text.index('end-2c')
-                self.result_text.tag_add('link', url_start, url_end)
+                self.result_text.insert(tk.END, before)
+                self.result_text.insert(tk.END, matched, 'highlight')
+                self.result_text.insert(tk.END, after)
+            else:
+                self.result_text.insert(tk.END, preview)
                 
-                # 添加发布时间
-                if article['publish_date']:
-                    self.result_text.insert(tk.END, f'发布时间: {article["publish_date"]}\n')
-                
-                # 添加预览内容
-                if article['preview']:
-                    preview_start = self.result_text.index('end-1c')
-                    self.result_text.insert(tk.END, f'预览: {article["preview"]}\n')
-                    preview_end = self.result_text.index('end-1c')
-                    # 高亮预览中的关键字
-                    self.highlight_keyword(preview_start, preview_end, keyword)
-                
-                self.result_text.insert(tk.END, '\n')
-        else:
-            self.result_text.insert(tk.END, '未找到匹配的结果\n')
+            self.result_text.insert(tk.END, '\n' + '-'*50 + '\n')
+
+    def save_to_cache(self, url: str, article_data: Dict):
+        """将文章保存到缓存
+        
+        该方法负责:
+        1. 将文章数据添加到内存缓存
+        2. 将缓存数据持久化到本地文件
+        3. 更新统计信息
+        
+        Args:
+            url: 文章URL
+            article_data: 文章数据字典
+        """
+        # 更新内存缓存
+        self.articles_cache[url] = article_data
+        
+        try:
+            # 将缓存写入JSON文件
+            cache_file = os.path.join(self.cache_dir, 'articles.json')
+            with open(cache_file, 'w', encoding='utf-8') as f:
+                json.dump(self.articles_cache, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f'保存缓存出错: {str(e)}')
+            
+        # 更新统计信息
+        self.update_statistics()
     
     def on_link_click(self, event):
         try:
