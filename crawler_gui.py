@@ -433,6 +433,23 @@ class WebCrawlerGUI:
         # 更新统计信息
         self.update_statistics()
     
+    def load_cache(self) -> Dict:
+        """加载缓存数据
+        
+        从本地文件加载已缓存的文章数据。如果缓存文件不存在，则返回空字典。
+        
+        Returns:
+            Dict: 包含已缓存文章数据的字典
+        """
+        cache_file = os.path.join(self.cache_dir, 'articles.json')
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f'加载缓存出错: {str(e)}')
+        return {}
+
     def on_link_click(self, event):
         try:
             index = self.result_text.index(f'@{event.x},{event.y}')
