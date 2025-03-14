@@ -450,15 +450,42 @@ class WebCrawlerGUI:
                 print(f'加载缓存出错: {str(e)}')
         return {}
 
+    def display_article(self, article_data):
+        """在GUI中显示文章信息
+        
+        Args:
+            article_data: 包含文章信息的字典
+        """
+        # 显示文章标题作为可点击链接
+        self.result_text.insert(tk.END, article_data['title'], 'link')
+        self.result_text.insert(tk.END, f'\nURL: {article_data["url"]}\n')
+        
+        # 显示发布时间和预览内容
+        if article_data.get('publish_date'):
+            self.result_text.insert(tk.END, f'发布时间: {article_data["publish_date"]}\n')
+        self.result_text.insert(tk.END, f'\n{article_data["preview"]}\n')
+        self.result_text.insert(tk.END, '\n' + '-'*50 + '\n')
+
     def on_link_click(self, event):
+        """处理链接点击事件
+        
+        当用户点击文章标题时，在默认浏览器中打开对应的URL
+        
+        Args:
+            event: 鼠标点击事件对象
+        """
         try:
+            # 获取点击位置的文本索引
             index = self.result_text.index(f'@{event.x},{event.y}')
+            # 获取当前行的起始位置
             line_start = self.result_text.index(f'{index} linestart')
-            line = self.result_text.get(line_start, f'{line_start} lineend')
-            
-            if line.startswith('URL: '):
-                url = line[5:].strip()
-                webbrowser.open(url)
+            # 向下查找最近的URL行
+            next_lines = self.result_text.get(line_start, f'{line_start}+5l')
+            for line in next_lines.split('\n'):
+                if line.startswith('URL: '):
+                    url = line[5:].strip()
+                    webbrowser.open(url)
+                    break
         except Exception as e:
             print(f'打开URL时出错: {str(e)}')
     
