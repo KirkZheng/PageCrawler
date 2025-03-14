@@ -456,15 +456,29 @@ class WebCrawlerGUI:
         Args:
             article_data: 包含文章信息的字典
         """
-        # 显示文章标题作为可点击链接
-        self.result_text.insert(tk.END, article_data['title'], 'link')
-        self.result_text.insert(tk.END, f'\nURL: {article_data["url"]}\n')
+        # 添加分隔线
+        self.result_text.insert(tk.END, '='*50 + '\n')
         
-        # 显示发布时间和预览内容
+        # 显示文章标题
+        self.result_text.insert(tk.END, '标题: ', 'highlight')
+        self.result_text.insert(tk.END, article_data['title'], 'link')
+        self.result_text.insert(tk.END, '\n\n')
+        
+        # 显示URL
+        self.result_text.insert(tk.END, 'URL: ', 'highlight')
+        self.result_text.insert(tk.END, f'{article_data["url"]}\n\n')
+        
+        # 显示发布时间
         if article_data.get('publish_date'):
-            self.result_text.insert(tk.END, f'发布时间: {article_data["publish_date"]}\n')
-        self.result_text.insert(tk.END, f'\n{article_data["preview"]}\n')
-        self.result_text.insert(tk.END, '\n' + '-'*50 + '\n')
+            self.result_text.insert(tk.END, '发布时间: ', 'highlight')
+            self.result_text.insert(tk.END, f'{article_data["publish_date"]}\n\n')
+        
+        # 显示预览内容
+        self.result_text.insert(tk.END, '预览内容: ', 'highlight')
+        self.result_text.insert(tk.END, f'{article_data["preview"]}\n')
+        
+        # 添加底部分隔线
+        self.result_text.insert(tk.END, '\n' + '='*50 + '\n\n')
 
     def on_link_click(self, event):
         """处理链接点击事件

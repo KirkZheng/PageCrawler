@@ -1,7 +1,0 @@
-标题: 核电站: 为了人民，做了91porn的源
-
-发布时间: 
-原文链接: https://hwv430.blogspot.com/2015/12/91porn.html
-
-正文内容:
-下班后没回去，陪同事加班，主要时间耗在feed43制作rss源上。查了包括html语法在内很多资料，写了大半夜的代码，终于在18日凌晨3:20左右成功地给91porn做了源。这是Item Search Pattern代码：<div class="imagechannelhd">{*}<a target=blank href="{%}">{*}<img src="{%}" width="120" title="{%}" />{*}</a>{*}</div>此段源代码是：<div class="imagechannelhd"><img alt="" class="png-over" src="http://d.u6p.co/images/hd.png"><a target=blank href="http://d.u6p.co/view_video.php?viewkey=f1992fdefe2bd30d7beb&page=1&viewtype=basic&category=mr"><img src="http://img2.t6k.co/thumb/1_140783.jpg" width="120" title="Young woman mastubate to me" /></a></div> 本来想扩充一下功能，把收藏数、观看次数也列出来。包括如下：<a target=blank href="http://d.u6p.co/view_video.php?viewkey=f1992fdefe2bd30d7beb&page=1&viewtype=basic&category=mr" title="Young woman mastubate to me"><span class="title">Young woman mastubate...</span></a><br /><span class="info">Runtime:</span>10:24<br/><span class="info">Added:</span> 1 hours ago <br /><span class="info">From:</span> <a href="http://d.u6p.co/uprofile.php?UID=4367462" target="_parent">pengge54948055</a><br/> <span class="info">Views:</span> 2044&nbsp; <span class="info">Favorites:</span> 0<br/><span class="info">Comments:</span> 0&nbsp;<span class="info">Point:</span> 0<br/><div class="startratebox"> <span class="info">Not yet rated</span> </div></div>想想太麻烦了，直接做完。得到的源地址是：http://www.feed43.com/zhbq.xml成功了！

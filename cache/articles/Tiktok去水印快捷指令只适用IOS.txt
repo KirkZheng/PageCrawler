@@ -1,0 +1,7 @@
+Tiktok去水印快捷指令（只适用IOS）
+
+发布时间: 
+原文链接: https://hwv430.blogspot.com/2022/06/tiktokios.html#comment-form
+
+正文内容:
+复制tiktok视频分享链接，点击指令运行即可将无水印视频保存到相册（需特殊网络环境）。 安装说明 快捷指令：https://www.icloud.com/shortcuts/dd4b893f44cc4ab3b47a910fd80095d1 拷贝到Safari浏览器打开 首次使用快捷指令的用户，务必首先开启「私人共享/允许不受信任的快捷指令」设置。 路径：设置-快捷指令-私人共享 如遇到不兼容的情况，请更新iOS/iPadOS系统到最新版本，或到苹果App Store安装最新版的「快捷指令」App。

@@ -1,7 +1,0 @@
-标题: 核电站: 一些神经网络工具
-
-发布时间: 
-原文链接: https://hwv430.blogspot.com/2023/03/1-httpsiftttg41ht37-2-httpswwwalteredai.html
-
-正文内容:
-继续收集一些神经网络工具 —— 1. https://www.useblackbox.io/ - 另一个编程助手。 2. https://www.altered.ai/ - 实时变声服务。 3. https://alpha.genmo.ai/ - 用文本生成视频（超越图像）。 4. https://www.magicslides.app/ - 快速创建演示文稿。 5. https://www.kinetix.tech/ - AI创建3D动画。 6. https://www.autodraw.com/ - 智能绘图。 7. https://brandmark.io/tools/ - logo生成器。 8. https://paraphrasetool.com/ - 写作辅助工具，用100种语言解析您的文本。 9. https://pictodream.com/ - 用照片创建头像。 10. https://sheetplus.ai/ - 将文本转换为准确的 Excel 公式和 Google 表格公式。 曾经介绍过的神经网络工具在这里： https://t.me/iyouport/12308 https://t.me/iyouport/12340 #tools #AI
